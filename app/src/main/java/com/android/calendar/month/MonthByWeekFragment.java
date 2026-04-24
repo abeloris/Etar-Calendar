@@ -18,6 +18,7 @@ package com.android.calendar.month;
 
 import android.app.Activity;
 import android.content.ContentUris;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.StateListDrawable;
@@ -39,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 
+import androidx.core.content.ContextCompat;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentManager;
 import androidx.loader.app.LoaderManager;
@@ -53,10 +55,14 @@ import com.android.calendar.theme.DynamicThemeKt;
 import com.android.calendar.Event;
 import com.android.calendar.Utils;
 import com.android.calendar.event.CreateEventDialogFragment;
+import com.android.calendar.persistence.tasks.DmfsOpenTasksContract;
 import com.android.calendar.calendarcommon2.Time;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -399,6 +405,15 @@ public class MonthByWeekFragment extends SimpleDayPickerFragment implements
             ArrayList<Event> events = new ArrayList<Event>();
             Event.buildEventsFromCursor(
                     events, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+
+            if (ContextCompat.checkSelfPermission(mContext, DmfsOpenTasksContract.TASK_READ_PERMISSION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                Cursor cTasks = Event.instancesQueryForTasks(mContext.getContentResolver(), Event.TASK_PROJECTION, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+                Event.buildTasksFromCursor(events, cTasks, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+
+                Collections.sort(events, Comparator.comparing(u -> new Date(u.getStartMillis())));
+            }
+
             ((MonthByWeekAdapter) mAdapter).setEvents(mFirstLoadedJulianDay,
                     mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, events);
         }

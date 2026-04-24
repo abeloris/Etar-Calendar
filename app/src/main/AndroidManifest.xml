@@ -18,6 +18,7 @@
 */
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -33,6 +34,8 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="org.dmfs.permission.READ_TASKS" />
+    <uses-permission android:name="org.dmfs.permission.WRITE_TASKS" />
 
     <queries>
         <intent>
@@ -50,6 +53,8 @@
             <category android:name="android.intent.category.BROWSABLE" />
             <data android:scheme="https" />
         </intent>
+        <provider android:authorities="org.tasks" android:exported="false" />
+        <provider android:authorities="org.dmfs.tasks" android:exported="false" />
     </queries>
 
     <application android:name="com.android.calendar.CalendarApplication"
@@ -83,6 +88,11 @@
 
             <meta-data android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
+
+            <meta-data android:name="${applicationId}.dynamic_icons"
+                android:resource="@array/calendar_icons_dynamic" />
+            <meta-data android:name="com.teslacoilsw.launcher.calendarIconArray"
+                android:resource="@array/calendar_icons_dynamic" />
 
         </activity>
 
@@ -260,9 +270,11 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.calendar.alerts.AlertService"
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType= "systemExempted"
             android:exported="false"
-            android:foregroundServiceType="systemExempted" />
+            tools:node="merge" />
 
         <service android:name="com.android.calendar.alerts.DismissAlarmsService" />
 

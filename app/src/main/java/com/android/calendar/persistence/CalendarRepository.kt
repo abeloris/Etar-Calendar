@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.net.Uri
 import android.provider.CalendarContract
+
 import com.android.calendar.datasource.AccountDataSource
 import com.android.calendar.datasource.CalendarDataSource
 import com.android.calendar.datasource.EventDataSource
@@ -68,14 +69,13 @@ internal class CalendarRepository(val application: Application) : ICalendarRepos
     override fun deleteLocalCalendar(accountName: String, id: Long): Boolean =
         calendarDataSource.deleteLocalCalendar(accountName, id)
 
-    override fun queryAccount(calendarId: Long): Account? =
-        accountDataSource.queryAccount(calendarId)
+    override fun queryAccount(calendarId: Long, isTask: Boolean): Account? =
+        accountDataSource.queryAccount(calendarId, isTask)
 
-    override fun queryNumberOfEvents(calendarId: Long): Long? =
-        eventDataSource.queryNumberOfEvents(calendarId)
+    override fun queryNumberOfEvents(calendarId: Long, isTask: Boolean): Long? =
+        eventDataSource.queryNumberOfEvents(calendarId, isTask)
 
     companion object {
-
         /**
          * Operations only work if they are made "under" the correct account
          *
